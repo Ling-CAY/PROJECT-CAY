@@ -4,3 +4,4 @@ config_back/
 .venv/
 *.log
 .DS_Store
+config.toml
