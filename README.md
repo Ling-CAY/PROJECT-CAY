@@ -1,9 +1,21 @@
-# 麦麦跨群记忆
+# CAYRememberYou（跨群记忆）
 
 > **默认不消耗 Token**：纯本地关键词检索（只读 MaiBot 自己的 SQLite）。
 > 向量语义是**可选开关**，只有你手动打开后才会产生 embedding 费用。
 
 让麦麦记得你在**别的群**说过什么，并在合适的时机自然提起。
+
+## 安装
+
+**方式一：插件市场（推荐）**
+
+MaiBot WebUI → 插件 → 插件市场 → 搜索「跨群记忆」→ 安装 → 启用 → 重启。
+
+**方式二：手动安装**
+
+把本仓库内容放进 `数据目录/plugins/CAYRememberYou/`，重启 MaiBot。
+
+> `config.toml` 由 Runner 根据 `PluginConfigBase` 自动生成，**不要手动放在插件目录里**。
 
 ## 功能
 
@@ -36,6 +48,11 @@ rerank_limit = 20        # 只重排 Top N，越小越省
 min_similarity = 0.35
 ```
 
-## 安装
+## 兼容性
 
-解压到 `数据目录/plugins/CAYRememberYou/`，重启 MaiBot 或在插件页启用。
+- MaiBot 1.3.0 ~ 1.3.99
+- 纯 Python 标准库，无第三方依赖
+
+## 许可
+
+MIT
