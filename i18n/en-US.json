@@ -1,0 +1,9 @@
+{
+  "locale": "en-US",
+  "plugin.name": "Cross-group Memory",
+  "plugin.description": "Recall what was said in other chats and mention it naturally",
+  "config.memory": "Memory",
+  "config.privacy": "Privacy",
+  "config.groups": "Groups",
+  "config.semantic": "Semantic"
+}

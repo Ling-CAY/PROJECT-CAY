@@ -1,0 +1,40 @@
+# CAYRememberYou 跨群记忆配置（v3.5，新 SDK）
+
+[plugin]
+enabled = true
+config_version = "3.8.0"
+
+[memory]
+inject_enabled = true
+# 记忆曲线 / Curve = 越久远越模糊；固定窗口 / Window = 超过天数直接忘记
+decay_mode = "记忆曲线 / Curve"
+lookback_days = 30
+half_life_days = 7.0
+min_decay_weight = 0.05
+scan_limit = 1000
+max_snippets = 4
+min_score = 0.18
+min_message_chars = 6
+max_chars_per_message = 120
+skip_bot_messages = true
+skip_commands = true
+
+[privacy]
+private_as_source = true
+private_as_target = true
+mask_nicknames = false
+blocked_stream_ids = []
+
+[groups]
+# 全部群 / All、全部禁止 / None、仅白名单 / Whitelist、除黑名单外 / Blacklist
+mode = "全部群 / All"
+group_ids = []
+
+[command]
+enabled = true
+[semantic]
+# ⚠ 开启后每次检索会多一次 embedding 请求，Token / 额度消耗会上涨
+enabled = false
+# 只对关键词召回的 Top N 条做向量重排（越小越省）
+rerank_limit = 20
+min_similarity = 0.35

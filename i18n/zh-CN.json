@@ -1,0 +1,9 @@
+{
+  "locale": "zh-CN",
+  "plugin.name": "跨群记忆",
+  "plugin.description": "检索其他群聊里说过的话，自然地提起",
+  "config.memory": "记忆",
+  "config.privacy": "隐私",
+  "config.groups": "群范围",
+  "config.semantic": "语义向量"
+}
