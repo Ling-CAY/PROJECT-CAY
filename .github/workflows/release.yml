@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from manifest
+        id: meta
+        run: |
+          VERSION=$(python3 -c "import json;print(json.load(open('_manifest.json'))['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.meta.outputs.version }}
+          name: CAYRememberYou v${{ steps.meta.outputs.version }}
+          generate_release_notes: true
+          body: |
+            ## 跨群记忆 v${{ steps.meta.outputs.version }}
+
+            让麦麦记得你在其他群聊里说过的话，并在合适时机自然提起。
+
+            - 默认纯本地关键词检索，**不消耗任何 Token**
+            - 可选向量语义重排（默认关闭，开启后才产生 embedding 费用）
+            - 中文近义词扩展 + 子串模糊匹配 + 时间衰减
+            - 记忆以系统提示注入，不污染用户消息
+            - 隐私可控：私聊来源开关、群黑白名单、昵称打码
