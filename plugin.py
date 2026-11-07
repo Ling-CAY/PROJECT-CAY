@@ -27,7 +27,7 @@ from pydantic import field_validator
 from maibot_sdk import Command, Field, HookHandler, MaiBotPlugin, PluginConfigBase, Tool
 from maibot_sdk.types import ErrorPolicy, HookMode, HookOrder, ToolParameterInfo, ToolParamType
 
-PLUGIN_VERSION = "3.8.0"
+PLUGIN_VERSION = "3.9.0"
 
 
 # ---------------------------------------------------------------- 配置模型 ----
@@ -215,6 +215,18 @@ class CommandSection(PluginConfigBase):
         default=True,
         description="启用 /跨群记忆 命令 / Enable the /跨群记忆 command",
         json_schema_extra={"label": "启用命令 / Enable command"},
+    )
+    allowed_users: List[str] = Field(
+        default_factory=list,
+        description=(
+            "允许使用 /跨群记忆 的 QQ 号，逗号分隔（主人 / 管理员）。"
+            "留空表示所有人都能用；填写后仅名单内的用户可用。"
+            "MaiBot 1.4+ 也可在 WebUI 的命令权限中按用户/聊天单独限制。"
+        ),
+        json_schema_extra={
+            "label": "命令白名单（QQ号，逗号分隔）",
+            "placeholder": "1504935902,123456789",
+        },
     )
 
 
@@ -896,6 +908,26 @@ class CAYRememberYou(MaiBotPlugin):
             return base
 
     @staticmethod
+    def _sender_id(kwargs: Dict[str, Any]) -> str:
+        """从命令参数里取发送者 QQ 号。"""
+
+        message = kwargs.get("message")
+        if isinstance(message, dict):
+            for key in ("user_id", "sender_id"):
+                value = message.get(key)
+                if value:
+                    return str(value)
+            info = message.get("message_info")
+            if isinstance(info, dict):
+                user = info.get("user_info")
+                if isinstance(user, dict) and user.get("user_id"):
+                    return str(user["user_id"])
+        for key in ("user_id", "sender_id"):
+            if kwargs.get(key):
+                return str(kwargs[key])
+        return ""
+
+    @staticmethod
     def _message_text(message: dict[str, Any]) -> str:
         for key in ("processed_plain_text", "plain_text", "text"):
             value = message.get(key)
@@ -993,6 +1025,15 @@ class CAYRememberYou(MaiBotPlugin):
     async def cmd_memory(self, **kwargs: Any) -> tuple[bool, str, int]:
         stream_id = str(kwargs.get("stream_id") or "")
         query = str(kwargs.get("query") or "").strip()
+
+        # 权限校验：配置了白名单时，只有名单内的用户（主人/管理员）可用
+        allowed = [str(x).strip() for x in (self.config.command.allowed_users or []) if str(x).strip()]
+        if allowed:
+            sender = self._sender_id(kwargs)
+            if sender not in allowed:
+                await self.ctx.send.text("这个命令仅限管理员使用。", stream_id)
+                self.ctx.logger.info("跨群记忆命令被拒绝：user=%s", sender or "未知")
+                return True, "权限不足", 1
 
         if not query:
             await self.ctx.send.text(
